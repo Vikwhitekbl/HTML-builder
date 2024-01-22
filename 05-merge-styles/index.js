@@ -4,7 +4,8 @@ const path = require('path');
 const dirPath = path.join(__dirname, 'styles');
 const bundlePath = path.join(__dirname, 'project-dist', 'bundle.css');
 
-fs.promises.readdir(dirPath)
+const mergeStyles = (dirPath, bundlePath) => {
+    return fs.promises.readdir(dirPath)
     .then((files) => {
         const currentFiles = files.filter((file) => {
             const filePath = path.join(dirPath, file);
@@ -28,3 +29,10 @@ fs.promises.readdir(dirPath)
     .catch((err) => {
         console.error(err);
     });
+};
+
+mergeStyles(dirPath, bundlePath);
+
+module.exports = {
+    mergeStyles
+};
