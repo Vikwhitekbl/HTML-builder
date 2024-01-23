@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 
 const dir = './03-files-in-folder/secret-folder';
 fs.readdir(dir, (err, files) => {
@@ -13,7 +14,8 @@ fs.readdir(dir, (err, files) => {
             }
             if (inf.isFile()) {
                 const fileSize = (inf.size / 1024).toFixed(3);
-                console.log(`${file} - ${extention(file)} - ${fileSize}kB`);
+                const { name } = path.parse(file);
+                console.log(`${name} - ${extention(file)} - ${fileSize}kB`);
             }
         });
     });
