@@ -32,7 +32,3 @@ const mergeStyles = (dirPath, bundlePath) => {
 };
 
 mergeStyles(dirPath, bundlePath);
-
-module.exports = {
-    mergeStyles
-};

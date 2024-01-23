@@ -27,7 +27,3 @@ const copyDir = async () => {
 };
 
 copyDir();
-
-module.exports = {
-    copyDir
-};
