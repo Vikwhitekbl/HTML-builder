@@ -61,6 +61,34 @@ const mergeStyles = (dirPath, bundlePath) => {
     });
 };
 
+const replaceTags = (templateContent) => {
+    const tagExp = /{{(.*?)}}/g;
+    let match;
+    newTemplate = templateContent;
+
+    const replaceTag = () => {
+        if((match = tagExp.exec(templateContent)) !== null) {
+            const tag = match[1];
+            const componentsFilePath = path.join(__dirname, componentsDirPath, `${tag}.html`);
+
+            fs.promises.readFile(componentsFilePath, 'utf-8')
+                .then((componentContent) => {
+                    newTemplate = newTemplate.replace(`{{${tag}}}`, componentContent);
+                    replaceTag();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+        }   else {
+            fs.promises.writeFile(htmlDirPath, newTemplate, 'utf-8')
+                .catch((err) => {
+                    console.error(err);
+                });
+        }
+    };
+    replaceTag();
+};
+
 fs.promises
     .access(projectDistDirPath)
     .catch((err) => {
@@ -73,28 +101,7 @@ fs.promises
     .then(() => {
         return fs.promises.readFile(templateFilePath, 'utf-8')
     })
-    .then((file) => {
-        const tagExp = /{{(.*?)}}/g;
-        let match;
-        while ((match = tagExp.exec(file)) !== null) {
-            tags.push(match[1]);
-        }
-        return tags;
-    })
-    .then((tags) => {
-        return tags.reduce((promise, tag) => {
-            return promise.then(() => {
-                const componentsFilePath = path.join(__dirname, componentsDirPath, `${tag}.html`);
-                return fs.promises.readFile(componentsFilePath, 'utf-8')
-                    .then((componentContent) => {   
-                        newTemplate += componentContent.replace(`{{${tag}}}`, '');
-                    });
-            });
-        }, Promise.resolve())
-    })
-    .then(() => {
-        return fs.promises.writeFile(htmlDirPath, newTemplate, 'utf-8');
-    })
+    .then(replaceTags)
     .then(() => {
         const stylesDirPath = path.join(__dirname, 'styles');
         const newStylesPath = path.join(projectDistDirPath, 'style.css');
